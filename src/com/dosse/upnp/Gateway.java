@@ -100,7 +100,7 @@ class Gateway {
     }
 
     private Map<String, String> command(String action, Map<String, String> params) throws Exception {
-        Map<String, String> ret = new HashMap<String, String>();
+        Map<String, String> ret = new HashMap<>();
         String soap = "<?xml version=\"1.0\"?>\r\n" + "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
                 + "<SOAP-ENV:Body>"
                 + "<m:" + action + " xmlns:m=\"" + serviceType + "\">";
@@ -150,18 +150,18 @@ class Gateway {
         }
     }
 
-    public boolean openPort(int port, boolean udp) {
+    public boolean openPort(int port, boolean udp, String appName) {
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("NewRemoteHost", "");
         params.put("NewProtocol", udp ? "UDP" : "TCP");
         params.put("NewInternalClient", iface.getHostAddress());
         params.put("NewExternalPort", "" + port);
         params.put("NewInternalPort", "" + port);
         params.put("NewEnabled", "1");
-        params.put("NewPortMappingDescription", "WaifUPnP");
+        params.put("NewPortMappingDescription", appName);
         params.put("NewLeaseDuration", "0");
         try {
             Map<String, String> r = command("AddPortMapping", params);
@@ -175,7 +175,7 @@ class Gateway {
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("NewRemoteHost", "");
         params.put("NewProtocol", udp ? "UDP" : "TCP");
         params.put("NewExternalPort", "" + port);
@@ -191,7 +191,7 @@ class Gateway {
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("NewRemoteHost", "");
         params.put("NewProtocol", udp ? "UDP" : "TCP");
         params.put("NewExternalPort", "" + port);
