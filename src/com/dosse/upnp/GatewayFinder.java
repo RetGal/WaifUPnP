@@ -23,6 +23,8 @@ import java.net.*;
 import java.util.Enumeration;
 import java.util.LinkedList;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  *
  * @author Federico
@@ -52,7 +54,7 @@ abstract class GatewayFinder {
 
         @Override
         public void run() {
-            byte[] req = this.req.getBytes();
+            byte[] req = this.req.getBytes(UTF_8);
             try (DatagramSocket s = new DatagramSocket(new InetSocketAddress(ip, 0))) {
                 s.send(new DatagramPacket(req, req.length, new InetSocketAddress("239.255.255.250", 1900)));
                 s.setSoTimeout(3000);

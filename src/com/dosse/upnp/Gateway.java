@@ -33,6 +33,8 @@ import org.w3c.dom.traversal.DocumentTraversal;
 import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.NodeIterator;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * 
  * @author Federico
@@ -48,7 +50,7 @@ class Gateway {
         iface = ip;
         routerip=gatewayip;
         String location = null;
-        StringTokenizer st = new StringTokenizer(new String(data), "\n");
+        StringTokenizer st = new StringTokenizer(new String(data, UTF_8), "\n");
         while (st.hasMoreTokens()) {
             String s = st.nextToken().trim();
             if (s.isEmpty() || s.startsWith("HTTP/1.") || s.startsWith("NOTIFY *")) {
@@ -135,7 +137,7 @@ class Gateway {
             }
         }
         soap.append("</m:").append(action).append("></SOAP-ENV:Body></SOAP-ENV:Envelope>");
-        return soap.toString().getBytes();
+        return soap.toString().getBytes(UTF_8);
     }
 
     public String getGatewayIP(){ return routerip.getHostAddress(); }
