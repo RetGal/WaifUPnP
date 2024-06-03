@@ -18,13 +18,8 @@
  */
 package com.dosse.upnp;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.SocketTimeoutException;
+import java.io.IOException;
+import java.net.*;
 import java.util.Enumeration;
 import java.util.LinkedList;
 
@@ -46,8 +41,8 @@ abstract class GatewayFinder {
 
     private class GatewayListener extends Thread {
 
-        private Inet4Address ip;
-        private String req;
+        private final Inet4Address ip;
+        private final String req;
 
         public GatewayListener(Inet4Address ip, String req) {
             setName("WaifUPnP - Gateway Listener");
@@ -57,17 +52,16 @@ abstract class GatewayFinder {
 
         @Override
         public void run() {
-            try {
-                byte[] req = this.req.getBytes();
-                DatagramSocket s = new DatagramSocket(new InetSocketAddress(ip, 0));
+            byte[] req = this.req.getBytes();
+            try (DatagramSocket s = new DatagramSocket(new InetSocketAddress(ip, 0))) {
                 s.send(new DatagramPacket(req, req.length, new InetSocketAddress("239.255.255.250", 1900)));
                 s.setSoTimeout(3000);
-                for (;;) {
+                for (; ; ) {
                     try {
                         DatagramPacket recv = new DatagramPacket(new byte[1536], 1536);
                         s.receive(recv);
                         Gateway gw = new Gateway(recv.getData(), ip, recv.getAddress());
-                        String extIp= gw.getExternalIP();
+                        String extIp = gw.getExternalIP();
                         if (isPublic(extIp)) { //Exclude gateways without a public external IP
                             gatewayFound(gw);
                         }
@@ -76,12 +70,12 @@ abstract class GatewayFinder {
                     } catch (Throwable t) {
                     }
                 }
-            } catch (Throwable t) {
+            } catch (IOException e) {
             }
         }
     }
 
-    private LinkedList<GatewayListener> listeners = new LinkedList<>();
+    private final LinkedList<GatewayListener> listeners = new LinkedList<>();
 
     public GatewayFinder() {
         for (Inet4Address ip : getLocalIPs()) {
@@ -115,7 +109,7 @@ abstract class GatewayFinder {
                         continue;
                     }
                     Enumeration<InetAddress> addrs = iface.getInetAddresses();
-                    if (addrs == null) {
+                    if (!addrs.hasMoreElements()) {
                         continue;
                     }
                     while (addrs.hasMoreElements()) {
