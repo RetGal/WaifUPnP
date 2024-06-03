@@ -31,7 +31,7 @@ Once you have the .jar files:
 
 ## Compatibility
 
-Java 6 and newer
+Java 8 and newer
 
 ## Limitations
 
