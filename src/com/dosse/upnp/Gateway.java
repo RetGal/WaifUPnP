@@ -156,12 +156,12 @@ class Gateway {
         }
     }
 
-    public boolean openPort(int port, boolean udp, String appName) {
+    public boolean openPort(int port, String remoteHost, boolean udp, String appName) {
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
         Map<String, String> params = new HashMap<>();
-        params.put("NewRemoteHost", "");
+        params.put("NewRemoteHost", remoteHost == null ? "" : remoteHost);
         params.put("NewProtocol", udp ? "UDP" : "TCP");
         params.put("NewInternalClient", iface.getHostAddress());
         params.put("NewExternalPort", "" + port);
@@ -177,12 +177,12 @@ class Gateway {
         }
     }
 
-    public boolean closePort(int port, boolean udp) {
+    public boolean closePort(int port, String remoteHost, boolean udp) {
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
         Map<String, String> params = new HashMap<>();
-        params.put("NewRemoteHost", "");
+        params.put("NewRemoteHost", remoteHost == null ? "" : remoteHost);
         params.put("NewProtocol", udp ? "UDP" : "TCP");
         params.put("NewExternalPort", "" + port);
         try {
@@ -193,12 +193,12 @@ class Gateway {
         }
     }
 
-    public boolean isMapped(int port, boolean udp) {
+    public boolean isMapped(int port, String remoteHost, boolean udp) {
         if (port < 0 || port > 65535) {
             throw new IllegalArgumentException("Invalid port");
         }
         Map<String, String> params = new HashMap<>();
-        params.put("NewRemoteHost", "");
+        params.put("NewRemoteHost", remoteHost == null ? "" : remoteHost);
         params.put("NewProtocol", udp ? "UDP" : "TCP");
         params.put("NewExternalPort", "" + port);
         try {
