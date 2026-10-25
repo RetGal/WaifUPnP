@@ -20,8 +20,7 @@ package com.dosse.upnp;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -56,6 +55,7 @@ abstract class GatewayFinder {
         public void run() {
             byte[] req = this.req.getBytes(UTF_8);
             try (DatagramSocket s = new DatagramSocket(new InetSocketAddress(ip, 0))) {
+                Set<Gateway> foundGateways = new LinkedHashSet<>();
                 s.send(new DatagramPacket(req, req.length, new InetSocketAddress("239.255.255.250", 1900)));
                 s.setSoTimeout(3000);
                 for (; ; ) {
@@ -63,14 +63,18 @@ abstract class GatewayFinder {
                         DatagramPacket recv = new DatagramPacket(new byte[1536], 1536);
                         s.receive(recv);
                         Gateway gw = new Gateway(recv.getData(), ip, recv.getAddress());
+                        foundGateways.add(gw);
                         String extIp = gw.getExternalIP();
-                        if (isPublic(extIp)) { //Exclude gateways without a public external IP
+                        if (isPublic(extIp)) { // Exclude gateways without a public external IP
                             gatewayFound(gw);
                         }
                     } catch (SocketTimeoutException t) {
                         break;
                     } catch (Throwable t) {
                     }
+                }
+                if (!foundGateways.isEmpty()) { // If no gateway with a public external IP was found, return the first one
+                    gatewayFound(foundGateways.iterator().next());
                 }
             } catch (IOException e) {
             }
